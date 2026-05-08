@@ -1,0 +1,70 @@
+{
+  "c2array": true,
+  "size": [10, 5, 1],
+  "data": [
+    [
+      ["What is the capital of France?"],
+      ["Paris"],
+      ["Berlin"],
+      ["Madrid"],
+      ["Rome"]
+    ],
+    [
+      ["Which planet is known as the Red Planet?"],
+      ["Mars"],
+      ["Venus"],
+      ["Jupiter"],
+      ["Saturn"]
+    ],
+    [
+      ["Who painted the Mona Lisa?"],
+      ["Leonardo da Vinci"],
+      ["Vincent van Gogh"],
+      ["Pablo Picasso"],
+      ["Claude Monet"]
+    ],
+    [
+      ["What is the largest mammal in the world?"],
+      ["Blue Whale"],
+      ["Elephant"],
+      ["Giraffe"],
+      ["Great White Shark"]
+    ],
+    [
+      ["Which element has the chemical symbol 'O'?"],
+      ["Oxygen"],
+      ["Gold"],
+      ["Silver"],
+      ["Iron"]
+    ],
+    [
+      ["In what year did the Titanic sink?"],
+      ["1912"],
+      ["1905"],
+      ["1920"],
+      ["1898"]
+    ],
+    [
+      ["Which language is primarily used for Android app development?"],
+      ["Kotlin"],
+      ["Swift"],
+      ["C#"],
+      ["PHP"]
+    ],
+    [
+      ["What is the hardest natural substance on Earth?"],
+      ["Diamond"],
+      ["Gold"],
+      ["Iron"],
+      ["Quartz"]
+    ],
+    [["How many continents are there on Earth?"], ["7"], ["5"], ["6"], ["8"]],
+    [
+      ["Which game engine uses 'Event Sheets' instead of traditional coding?"],
+      ["Construct"],
+      ["Unity"],
+      ["Unreal"],
+      ["Godot"]
+    ]
+  ]
+}
