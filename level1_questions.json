@@ -1,0 +1,20 @@
+{
+  "c2array": true,
+  "size": [2, 5, 1],
+  "data": [
+    [
+      ["What is the capital of France?"],
+      ["Paris"],
+      ["Berlin"],
+      ["Madrid"],
+      ["Rome"]
+    ],
+    [
+      ["Which planet is known as the Red Planet?"],
+      ["Mars"],
+      ["Venus"],
+      ["Jupiter"],
+      ["Saturn"]
+    ]
+  ]
+}

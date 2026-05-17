@@ -1,0 +1,28 @@
+{
+  "c2array": true,
+  "size": [3, 5, 1],
+  "data": [
+    [
+      ["Which language is primarily used for Android app development?"],
+      ["Kotlin"],
+      ["Swift"],
+      ["C#"],
+      ["PHP"]
+    ],
+    [
+      ["What is the hardest natural substance on Earth?"],
+      ["Diamond"],
+      ["Gold"],
+      ["Iron"],
+      ["Quartz"]
+    ],
+    [["How many continents are there on Earth?"], ["7"], ["5"], ["6"], ["8"]],
+    [
+      ["Which game engine uses 'Event Sheets' instead of traditional coding?"],
+      ["Construct"],
+      ["Unity"],
+      ["Unreal"],
+      ["Godot"]
+    ]
+  ]
+}
