@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1779304305,
+	"version": 1779307102,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -31,10 +31,10 @@
 		"images/popupbuttonssprite-sheet0.png",
 		"images/popupbuttonssprite-sheet1.png",
 		"images/popupbuttonssprite-sheet2.png",
-		"images/sprite-sheet0.png",
+		"images/levelnamessprite-sheet0.png",
 		"images/sprite2-sheet0.png",
 		"images/sprite2-sheet1.png",
-		"images/sprite3-sheet0.png",
+		"images/logosprite-sheet0.png",
 		"images/particles1.png",
 		"images/popuptextsprite-sheet0.png",
 		"images/particles2.png",
