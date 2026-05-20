@@ -18203,6 +18203,364 @@ cr.plugins_.LocalStorage = function(runtime)
 }());
 ;
 ;
+cr.plugins_.NinePatch = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var pluginProto = cr.plugins_.NinePatch.prototype;
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+	var typeProto = pluginProto.Type.prototype;
+	typeProto.onCreate = function()
+	{
+		if (this.is_family)
+			return;
+		this.texture_img = new Image();
+		this.texture_img.cr_filesize = this.texture_filesize;
+		this.runtime.waitForImageLoad(this.texture_img, this.texture_file);
+		this.fillPattern = null;
+		this.leftPattern = null;
+		this.rightPattern = null;
+		this.topPattern = null;
+		this.bottomPattern = null;
+		this.webGL_texture = null;
+		this.webGL_fillTexture = null;
+		this.webGL_leftTexture = null;
+		this.webGL_rightTexture = null;
+		this.webGL_topTexture = null;
+		this.webGL_bottomTexture = null;
+	};
+	typeProto.onLostWebGLContext = function ()
+	{
+		if (this.is_family)
+			return;
+		this.webGL_texture = null;
+		this.webGL_fillTexture = null;
+		this.webGL_leftTexture = null;
+		this.webGL_rightTexture = null;
+		this.webGL_topTexture = null;
+		this.webGL_bottomTexture = null;
+	};
+	typeProto.onRestoreWebGLContext = function ()
+	{
+		if (this.is_family || !this.instances.length)
+			return;
+		if (!this.webGL_texture)
+		{
+			this.webGL_texture = this.runtime.glwrap.loadTexture(this.texture_img, true, this.runtime.linearSampling, this.texture_pixelformat);
+		}
+	};
+	typeProto.unloadTextures = function ()
+	{
+		if (this.is_family || this.instances.length)
+			return;
+		if (this.runtime.glwrap)
+		{
+			this.runtime.glwrap.deleteTexture(this.webGL_texture);
+			this.runtime.glwrap.deleteTexture(this.webGL_fillTexture);
+			this.runtime.glwrap.deleteTexture(this.webGL_leftTexture);
+			this.runtime.glwrap.deleteTexture(this.webGL_rightTexture);
+			this.runtime.glwrap.deleteTexture(this.webGL_topTexture);
+			this.runtime.glwrap.deleteTexture(this.webGL_bottomTexture);
+			this.webGL_texture = null;
+			this.webGL_fillTexture = null;
+			this.webGL_leftTexture = null;
+			this.webGL_rightTexture = null;
+			this.webGL_topTexture = null;
+			this.webGL_bottomTexture = null;
+		}
+	};
+	typeProto.slicePatch = function (x1, y1, x2, y2)
+	{
+		var tmpcanvas = document.createElement("canvas");
+		var w = x2 - x1;
+		var h = y2 - y1;
+		tmpcanvas.width = w;
+		tmpcanvas.height = h;
+		var tmpctx = tmpcanvas.getContext("2d");
+		tmpctx.drawImage(this.texture_img, x1, y1, w, h, 0, 0, w, h);
+		return tmpcanvas;
+	};
+	typeProto.createPatch = function (lm, rm, tm, bm)
+	{
+		var iw = this.texture_img.width;
+		var ih = this.texture_img.height;
+		var re = iw - rm;
+		var be = ih - bm;
+		if (this.runtime.glwrap)
+		{
+			if (this.webGL_fillTexture)
+				return;		// already created
+			var glwrap = this.runtime.glwrap;
+			var ls = this.runtime.linearSampling;
+			var tf = this.texture_pixelformat;
+			if (re > lm && be > tm)
+				this.webGL_fillTexture = glwrap.loadTexture(this.slicePatch(lm, tm, re, be), true, ls, tf);
+			if (lm > 0 && be > tm)
+				this.webGL_leftTexture = glwrap.loadTexture(this.slicePatch(0, tm, lm, be), true, ls, tf, "repeat-y");
+			if (rm > 0 && be > tm)
+				this.webGL_rightTexture = glwrap.loadTexture(this.slicePatch(re, tm, iw, be), true, ls, tf, "repeat-y");
+			if (tm > 0 && re > lm)
+				this.webGL_topTexture = glwrap.loadTexture(this.slicePatch(lm, 0, re, tm), true, ls, tf, "repeat-x");
+			if (bm > 0 && re > lm)
+				this.webGL_bottomTexture = glwrap.loadTexture(this.slicePatch(lm, be, re, ih), true, ls, tf, "repeat-x");
+		}
+		else
+		{
+			if (this.fillPattern)
+				return;		// already created
+			var ctx = this.runtime.ctx;
+			if (re > lm && be > tm)
+				this.fillPattern = ctx.createPattern(this.slicePatch(lm, tm, re, be), "repeat");
+			if (lm > 0 && be > tm)
+				this.leftPattern = ctx.createPattern(this.slicePatch(0, tm, lm, be), "repeat");
+			if (rm > 0 && be > tm)
+				this.rightPattern = ctx.createPattern(this.slicePatch(re, tm, iw, be), "repeat");
+			if (tm > 0 && re > lm)
+				this.topPattern = ctx.createPattern(this.slicePatch(lm, 0, re, tm), "repeat");
+			if (bm > 0 && re > lm)
+				this.bottomPattern = ctx.createPattern(this.slicePatch(lm, be, re, ih), "repeat");
+		}
+	};
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+	};
+	var instanceProto = pluginProto.Instance.prototype;
+	instanceProto.onCreate = function()
+	{
+		this.leftMargin = this.properties[0];
+		this.rightMargin = this.properties[1];
+		this.topMargin = this.properties[2];
+		this.bottomMargin = this.properties[3];
+		this.edges = this.properties[4];					// 0=tile, 1=stretch
+		this.fill = this.properties[5];						// 0=tile, 1=stretch, 2=transparent
+		this.visible = (this.properties[6] === 0);			// 0=visible, 1=invisible
+		this.seamless = (this.properties[8] !== 0);			// 1px overdraw to hide seams
+		if (this.recycled)
+			this.rcTex.set(0, 0, 0, 0);
+		else
+			this.rcTex = new cr.rect(0, 0, 0, 0);
+		if (this.runtime.glwrap)
+		{
+			if (!this.type.webGL_texture)
+			{
+				this.type.webGL_texture = this.runtime.glwrap.loadTexture(this.type.texture_img, false, this.runtime.linearSampling, this.type.texture_pixelformat);
+			}
+		}
+		this.type.createPatch(this.leftMargin, this.rightMargin, this.topMargin, this.bottomMargin);
+	};
+	function drawPatternProperly(ctx, pattern, pw, ph, drawX, drawY, w, h, ox, oy)
+	{
+		ctx.save();
+		ctx.fillStyle = pattern;
+		var offX = drawX % pw;
+		var offY = drawY % ph;
+		if (offX < 0)
+			offX += pw;
+		if (offY < 0)
+			offY += ph;
+		ctx.translate(offX + ox, offY + oy);
+		ctx.fillRect(drawX - offX - ox, drawY - offY - oy, w, h);
+		ctx.restore();
+	};
+	instanceProto.draw = function(ctx)
+	{
+		var img = this.type.texture_img;
+		var lm = this.leftMargin;
+		var rm = this.rightMargin;
+		var tm = this.topMargin;
+		var bm = this.bottomMargin;
+		var iw = img.width;
+		var ih = img.height;
+		var re = iw - rm;
+		var be = ih - bm;
+		ctx.globalAlpha = this.opacity;
+		ctx.save();
+		var myx = this.x;
+		var myy = this.y;
+		var myw = this.width;
+		var myh = this.height;
+		if (this.runtime.pixel_rounding)
+		{
+			myx = Math.round(myx);
+			myy = Math.round(myy);
+		}
+		var drawX = -(this.hotspotX * this.width);
+		var drawY = -(this.hotspotY * this.height);
+		var offX = drawX % iw;
+		var offY = drawY % ih;
+		if (offX < 0)
+			offX += iw;
+		if (offY < 0)
+			offY += ih;
+		ctx.translate(myx + offX, myy + offY);
+		var x = drawX - offX;
+		var y = drawY - offY;
+		var s = (this.seamless ? 1 : 0);
+		if (lm > 0 && tm > 0)
+			ctx.drawImage(img, 0, 0, lm + s, tm + s, x, y, lm + s, tm + s);
+		if (rm > 0 && tm > 0)
+			ctx.drawImage(img, re - s, 0, rm + s, tm + s, x + myw - rm - s, y, rm + s, tm + s);
+		if (rm > 0 && bm > 0)
+			ctx.drawImage(img, re - s, be - s, rm + s, bm + s, x + myw - rm - s, y + myh - bm - s, rm + s, bm + s);
+		if (lm > 0 && bm > 0)
+			ctx.drawImage(img, 0, be - s, lm + s, bm + s, x, y + myh - bm - s, lm + s, bm + s);
+		if (this.edges === 0)		// tile edges
+		{
+			var off = (this.fill === 2 ? 0 : s);
+			if (lm > 0 && be > tm)
+				drawPatternProperly(ctx, this.type.leftPattern, lm, be - tm, x, y + tm, lm + off, myh - tm - bm, 0, 0);
+			if (rm > 0 && be > tm)
+				drawPatternProperly(ctx, this.type.rightPattern, rm, be - tm, x + myw - rm - off, y + tm, rm + off, myh - tm - bm, off, 0);
+			if (tm > 0 && re > lm)
+				drawPatternProperly(ctx, this.type.topPattern, re - lm, tm, x + lm, y, myw - lm - rm, tm + off, 0, 0);
+			if (bm > 0 && re > lm)
+				drawPatternProperly(ctx, this.type.bottomPattern, re - lm, bm, x + lm, y + myh - bm - off, myw - lm - rm, bm + off, 0, off);
+		}
+		else if (this.edges === 1)	// stretch edges
+		{
+			if (lm > 0 && be > tm && myh - tm - bm > 0)
+				ctx.drawImage(img, 0, tm, lm, be - tm, x, y + tm, lm, myh - tm - bm);
+			if (rm > 0 && be > tm && myh - tm - bm > 0)
+				ctx.drawImage(img, re, tm, rm, be - tm, x + myw - rm, y + tm, rm, myh - tm - bm);
+			if (tm > 0 && re > lm && myw - lm - rm > 0)
+				ctx.drawImage(img, lm, 0, re - lm, tm, x + lm, y, myw - lm - rm, tm);
+			if (bm > 0 && re > lm && myw - lm - rm > 0)
+				ctx.drawImage(img, lm, be, re - lm, bm, x + lm, y + myh - bm, myw - lm - rm, bm);
+		}
+		if (be > tm && re > lm)
+		{
+			if (this.fill === 0)		// tile fill
+			{
+				drawPatternProperly(ctx, this.type.fillPattern, re - lm, be - tm, x + lm, y + tm, myw - lm - rm, myh - tm - bm, 0, 0);
+			}
+			else if (this.fill === 1)	// stretch fill
+			{
+				if (myw - lm - rm > 0 && myh - tm - bm > 0)
+				{
+					ctx.drawImage(img, lm, tm, re - lm, be - tm, x + lm, y + tm, myw - lm - rm, myh - tm - bm);
+				}
+			}
+		}
+		ctx.restore();
+	};
+	instanceProto.drawPatch = function(glw, tex, sx, sy, sw, sh, dx, dy, dw, dh)
+	{
+		glw.setTexture(tex);
+		var rcTex = this.rcTex;
+		rcTex.left = sx / tex.c2width;
+		rcTex.top = sy / tex.c2height;
+		rcTex.right = (sx + sw) / tex.c2width;
+		rcTex.bottom = (sy + sh) / tex.c2height;
+		glw.quadTex(dx, dy, dx + dw, dy, dx + dw, dy + dh, dx, dy + dh, rcTex);
+	};
+	instanceProto.tilePatch = function(glw, tex, dx, dy, dw, dh, ox, oy)
+	{
+		glw.setTexture(tex);
+		var rcTex = this.rcTex;
+		rcTex.left = -ox / tex.c2width;
+		rcTex.top = -oy / tex.c2height;
+		rcTex.right = (dw - ox) / tex.c2width;
+		rcTex.bottom = (dh - oy) / tex.c2height;
+		glw.quadTex(dx, dy, dx + dw, dy, dx + dw, dy + dh, dx, dy + dh, rcTex);
+	};
+	instanceProto.drawGL_earlyZPass = function(glw)
+	{
+		this.drawGL(glw);
+	};
+	instanceProto.drawGL = function(glw)
+	{
+		var lm = this.leftMargin;
+		var rm = this.rightMargin;
+		var tm = this.topMargin;
+		var bm = this.bottomMargin;
+		var iw = this.type.texture_img.width;
+		var ih = this.type.texture_img.height;
+		var re = iw - rm;
+		var be = ih - bm;
+		glw.setOpacity(this.opacity);
+		var rcTex = this.rcTex;
+		var q = this.bquad;
+		var myx = q.tlx;
+		var myy = q.tly;
+		var myw = this.width;
+		var myh = this.height;
+		if (this.runtime.pixel_rounding)
+		{
+			myx = Math.round(myx);
+			myy = Math.round(myy);
+		}
+		var s = (this.seamless ? 1 : 0);
+		if (lm > 0 && tm > 0)
+			this.drawPatch(glw, this.type.webGL_texture, 0, 0, lm + s, tm + s, myx, myy, lm + s, tm + s);
+		if (rm > 0 && tm > 0)
+			this.drawPatch(glw, this.type.webGL_texture, re - s, 0, rm + s, tm + s, myx + myw - rm - s, myy, rm + s, tm + s);
+		if (rm > 0 && bm > 0)
+			this.drawPatch(glw, this.type.webGL_texture, re - s, be - s, rm + s, bm + s, myx + myw - rm - s, myy + myh - bm - s, rm + s, bm + s);
+		if (lm > 0 && bm > 0)
+			this.drawPatch(glw, this.type.webGL_texture, 0, be - s, lm + s, bm + s, myx, myy + myh - bm - s, lm + s, bm + s);
+		if (this.edges === 0)		// tile edges
+		{
+			var off = (this.fill === 2 ? 0 : s);
+			if (lm > 0 && be > tm)
+				this.tilePatch(glw, this.type.webGL_leftTexture, myx, myy + tm, lm + off, myh - tm - bm, 0, 0);
+			if (rm > 0 && be > tm)
+				this.tilePatch(glw, this.type.webGL_rightTexture, myx + myw - rm - off, myy + tm, rm + off, myh - tm - bm, off, 0);
+			if (tm > 0 && re > lm)
+				this.tilePatch(glw, this.type.webGL_topTexture, myx + lm, myy, myw - lm - rm, tm + off, 0, 0);
+			if (bm > 0 && re > lm)
+				this.tilePatch(glw, this.type.webGL_bottomTexture, myx + lm, myy + myh - bm - off, myw - lm - rm, bm + off, 0, off);
+		}
+		else if (this.edges === 1)	// stretch edges
+		{
+			if (lm > 0 && be > tm)
+				this.drawPatch(glw, this.type.webGL_texture, 0, tm, lm, be - tm, myx, myy + tm, lm, myh - tm - bm);
+			if (rm > 0 && be > tm)
+				this.drawPatch(glw, this.type.webGL_texture, re, tm, rm, be - tm, myx + myw - rm, myy + tm, rm, myh - tm - bm);
+			if (tm > 0 && re > lm)
+				this.drawPatch(glw, this.type.webGL_texture, lm, 0, re - lm, tm, myx + lm, myy, myw - lm - rm, tm);
+			if (bm > 0 && re > lm)
+				this.drawPatch(glw, this.type.webGL_texture, lm, be, re - lm, bm, myx + lm, myy + myh - bm, myw - lm - rm, bm);
+		}
+		if (be > tm && re > lm)
+		{
+			if (this.fill === 0)		// tile fill
+			{
+				this.tilePatch(glw, this.type.webGL_fillTexture, myx + lm, myy + tm, myw - lm - rm, myh - tm - bm, 0, 0);
+			}
+			else if (this.fill === 1)	// stretch fill
+			{
+				this.drawPatch(glw, this.type.webGL_texture, lm, tm, re - lm, be - tm, myx + lm, myy + tm, myw - lm - rm, myh - tm - bm);
+			}
+		}
+	};
+	function Cnds() {};
+	Cnds.prototype.OnURLLoaded = function ()
+	{
+		return true;
+	};
+	pluginProto.cnds = new Cnds();
+	function Acts() {};
+	Acts.prototype.SetEffect = function (effect)
+	{
+		this.blend_mode = effect;
+		this.compositeOp = cr.effectToCompositeOp(effect);
+		cr.setGLBlend(this, effect, this.runtime.gl);
+		this.runtime.redraw = true;
+	};
+	pluginProto.acts = new Acts();
+	function Exps() {};
+	pluginProto.exps = new Exps();
+}());
+;
+;
 cr.plugins_.Rex_Hash = function(runtime)
 {
 	this.runtime = runtime;
@@ -22208,6 +22566,482 @@ cr.plugins_.Touch = function(runtime)
 }());
 ;
 ;
+cr.plugins_.video = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var pluginProto = cr.plugins_.video.prototype;
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+	var typeProto = pluginProto.Type.prototype;
+	typeProto.onCreate = function()
+	{
+	};
+	typeProto.onLostWebGLContext = function ()
+	{
+		if (this.is_family)
+			return;
+		var i, len, inst;
+		for (i = 0, len = this.instances.length; i < len; ++i)
+		{
+			inst = this.instances[i];
+			inst.webGL_texture = null;		// will lazy create again on next draw
+		}
+	};
+	var tmpVideo = document.createElement("video");
+	var can_play_webm = !!tmpVideo.canPlayType("video/webm");
+	var can_play_ogv = !!tmpVideo.canPlayType("video/ogg");
+	var can_play_mp4 = !!tmpVideo.canPlayType("video/mp4");
+	tmpVideo = null;
+	function isVideoPlaying(v)
+	{
+		return v && !v.paused && !v.ended && v.currentTime > 0;
+	};
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+	};
+	var instanceProto = pluginProto.Instance.prototype;
+	var playOnNextInput = [];
+	function playQueued()
+	{
+		var tryPlay = playOnNextInput.slice(0);
+		cr.clearArray(playOnNextInput);
+		var i, len, playRet, v;
+		for (i = 0, len = tryPlay.length; i < len; ++i)
+		{
+			v = tryPlay[i];
+			playRet = v.play();
+			if (playRet)
+			{
+				playRet.catch(function (err)
+				{
+					addVideoToPlayOnNextInput(v);
+				});
+			}
+		}
+	};
+	document.addEventListener("touchend", playQueued, true);
+	document.addEventListener("click", playQueued, true);
+	document.addEventListener("keydown", playQueued, true);
+	function addVideoToPlayOnNextInput(v)
+	{
+		var i = playOnNextInput.indexOf(v);
+		if (i === -1)
+			playOnNextInput.push(v);
+	};
+	instanceProto.queueVideoPlay = function (add)
+	{
+		if (!this.video)
+			return;
+		var i;
+		var self = this;
+		if (!add)
+		{
+			i = playOnNextInput.indexOf(this.video);
+			if (i >= 0)
+				playOnNextInput.splice(i, 1);
+			return;
+		}
+		var playRet;
+		try {
+			playRet = this.video.play();
+		}
+		catch (err)
+		{
+			addVideoToPlayOnNextInput(this.video);
+			return;
+		}
+		if (playRet)		// Promise was returned
+		{
+			playRet.catch(function (err)
+			{
+				if (self.video)
+					addVideoToPlayOnNextInput(self.video);
+			});
+		}
+		else if (this.useNextTouchWorkaround && !this.runtime.isInUserInputEvent)
+		{
+			addVideoToPlayOnNextInput(this.video);
+		}
+	};
+	instanceProto.onCreate = function()
+	{
+		this.webm_src = this.properties[0];
+		this.ogv_src = this.properties[1];
+		this.mp4_src = this.properties[2];
+		this.autoplay = this.properties[3];					// 0 = no, 1 = preload, 2 = yes
+		this.playInBackground = (this.properties[4] !== 0);	// 0 = no, 1 = yes
+		this.videoWasPlayingOnSuspend = false;
+		this.video = document.createElement("video");
+		this.video.crossOrigin = "anonymous";
+		this.video["playsInline"] = true;					// ensure inline playback on iOS
+		this.webGL_texture = null;
+		this.currentTrigger = -1;
+		this.viaCanvas = null;
+		this.viaCtx = null;
+		this.useViaCanvasWorkaround = this.runtime.isIE || this.runtime.isMicrosoftEdge;
+		var self = this;
+		this.video.addEventListener("canplay", function () {
+			self.currentTrigger = 0;
+			self.runtime.trigger(cr.plugins_.video.prototype.cnds.OnPlaybackEvent, self);
+		});
+		this.video.addEventListener("canplaythrough", function () {
+			self.currentTrigger = 1;
+			self.runtime.trigger(cr.plugins_.video.prototype.cnds.OnPlaybackEvent, self);
+		});
+		this.video.addEventListener("ended", function () {
+			self.currentTrigger = 2;
+			self.runtime.trigger(cr.plugins_.video.prototype.cnds.OnPlaybackEvent, self);
+		});
+		this.video.addEventListener("error", function () {
+			self.currentTrigger = 3;
+			self.runtime.trigger(cr.plugins_.video.prototype.cnds.OnPlaybackEvent, self);
+		});
+		this.video.addEventListener("loadstart", function () {
+			self.currentTrigger = 4;
+			self.runtime.trigger(cr.plugins_.video.prototype.cnds.OnPlaybackEvent, self);
+		});
+		this.video.addEventListener("playing", function () {
+			self.currentTrigger = 5;
+			self.runtime.trigger(cr.plugins_.video.prototype.cnds.OnPlaybackEvent, self);
+		});
+		this.video.addEventListener("pause", function () {
+			self.currentTrigger = 6;
+			self.runtime.trigger(cr.plugins_.video.prototype.cnds.OnPlaybackEvent, self);
+		});
+		this.video.addEventListener("stalled", function () {
+			self.currentTrigger = 7;
+			self.runtime.trigger(cr.plugins_.video.prototype.cnds.OnPlaybackEvent, self);
+		});
+		this.useNextTouchWorkaround = ((this.runtime.isiOS || (this.runtime.isAndroid && (this.runtime.isChrome || this.runtime.isAndroidStockBrowser))) && !this.runtime.isCrosswalk && !this.runtime.isDomFree);
+		if (this.autoplay === 0)
+		{
+			this.video.autoplay = false;
+			this.video.preload = "none";
+		}
+		else if (this.autoplay === 1)
+		{
+			this.video.autoplay = false;
+			this.video.preload = "auto";
+		}
+		else if (this.autoplay === 2)
+		{
+			this.video.autoplay = true;
+		}
+		this.setSource(this.webm_src, this.ogv_src, this.mp4_src);
+		if (this.autoplay === 2)
+			this.queueVideoPlay(true);
+		this.visible = (this.properties[5] !== 0);
+		this.runtime.tickMe(this);
+		if (!this.recycled)
+		{
+			var self = this;
+			this.runtime.addSuspendCallback(function(s)
+			{
+				self.onSuspend(s);
+			});
+		}
+	};
+	instanceProto.onSuspend = function (s)
+	{
+		if (this.playInBackground || !this.video)
+			return;
+		if (s)
+		{
+			if (isVideoPlaying(this.video))
+			{
+				this.queueVideoPlay(false);
+				this.video.pause();
+				this.videoWasPlayingOnSuspend = true;
+			}
+		}
+		else
+		{
+			if (this.videoWasPlayingOnSuspend)
+			{
+				this.queueVideoPlay(true);
+				this.videoWasPlayingOnSuspend = false;
+			}
+		}
+	};
+	instanceProto.setSource = function (webm_src, ogv_src, mp4_src)
+	{
+		var self = this;
+		var useSrc = "";
+		if (can_play_webm && webm_src)
+			useSrc = webm_src;
+		else if (can_play_ogv && ogv_src)
+			useSrc = ogv_src;
+		else if (can_play_mp4 && mp4_src)
+			useSrc = mp4_src;
+		if (useSrc)
+		{
+			if (!this.runtime.isAbsoluteUrl(useSrc))
+				useSrc = useSrc.toLowerCase();
+			this.video.src = useSrc;
+		}
+		if (this.runtime.glwrap && this.webGL_texture)
+		{
+			this.runtime.glwrap.deleteTexture(this.webGL_texture);
+			this.webGL_texture = null;
+		}
+		this.viaCanvas = null;
+		this.viaCtx = null;
+	};
+	instanceProto.onDestroy = function ()
+	{
+		this.queueVideoPlay(false);
+		if (isVideoPlaying(this.video))
+			this.video.pause();		// stop playback
+		if (this.runtime.glwrap && this.webGL_texture)
+		{
+			this.runtime.glwrap.deleteTexture(this.webGL_texture);
+			this.webGL_texture = null;
+		}
+		this.viaCanvas = null;
+		this.viaCtx = null;
+		this.video.src = "";		// memory is not always cleaned up unless we drop the src!
+		this.video = null;
+	};
+	instanceProto.tick = function ()
+	{
+		if (isVideoPlaying(this.video))
+			this.runtime.redraw = true;
+	};
+	instanceProto.saveToJSON = function ()
+	{
+		return {
+			"s": (this.video.src || ""),
+			"p": !!isVideoPlaying(this.video),
+			"t": (this.video.currentTime || 0)
+		};
+	};
+	instanceProto.loadFromJSON = function (o)
+	{
+		if (!o || typeof o["s"] === "undefined")
+			return;
+		var src = o["s"];
+		this.setSource(src, src, src);
+		try {
+			this.video.currentTime = o["t"];
+		}
+		catch (e) {};		// ignore if throws
+		if (o["p"])			// is playing
+		{
+			this.queueVideoPlay(true);
+		}
+		else
+		{
+			this.queueVideoPlay(false);
+			this.video.pause();
+		}
+	};
+	instanceProto.draw = function (ctx)
+	{
+		if (!this.video)
+			return;		// no video to draw
+		var videoWidth = this.video.videoWidth;
+		var videoHeight = this.video.videoHeight;
+		if (videoWidth <= 0 || videoHeight <= 0)
+			return;		// not yet loaded metadata
+		var videoAspect = videoWidth / videoHeight;
+		var dispWidth = this.width;
+		var dispHeight = this.height;
+		var dispAspect = dispWidth / dispHeight;
+		var offx = 0;
+		var offy = 0;
+		var drawWidth = 0;
+		var drawHeight = 0;
+		if (dispAspect > videoAspect)
+		{
+			drawWidth = dispHeight * videoAspect;
+			drawHeight = dispHeight;
+			offx = Math.floor((dispWidth - drawWidth) / 2);
+			if (offx < 0)
+				offx = 0;
+		}
+		else
+		{
+			drawWidth = dispWidth;
+			drawHeight = dispWidth / videoAspect;
+			offy = Math.floor((dispHeight - drawHeight) / 2);
+			if (offy < 0)
+				offy = 0;
+		}
+		ctx.globalAlpha = this.opacity;
+		ctx.drawImage(this.video, this.x + offx, this.y + offy, drawWidth, drawHeight);
+	};
+	var tmpRect = new cr.rect(0, 0, 0, 0);
+	var tmpQuad = new cr.quad();
+	instanceProto.drawGL = function (glw)
+	{
+		if (!this.video)
+			return;		// no video to draw
+		var videoWidth = this.video.videoWidth;
+		var videoHeight = this.video.videoHeight;
+		if (videoWidth <= 0 || videoHeight <= 0)
+			return;		// not yet loaded metadata
+		var videoAspect = videoWidth / videoHeight;
+		var dispWidth = this.width;
+		var dispHeight = this.height;
+		var dispAspect = dispWidth / dispHeight;
+		var offx = 0;
+		var offy = 0;
+		var drawWidth = 0;
+		var drawHeight = 0;
+		if (dispAspect > videoAspect)
+		{
+			drawWidth = dispHeight * videoAspect;
+			drawHeight = dispHeight;
+			offx = Math.floor((dispWidth - drawWidth) / 2);
+			if (offx < 0)
+				offx = 0;
+		}
+		else
+		{
+			drawWidth = dispWidth;
+			drawHeight = dispWidth / videoAspect;
+			offy = Math.floor((dispHeight - drawHeight) / 2);
+			if (offy < 0)
+				offy = 0;
+		}
+		if (!this.webGL_texture)
+		{
+			this.webGL_texture = glw.createEmptyTexture(videoWidth, videoHeight, this.runtime.linearSampling, false, false);
+		}
+		if (this.useViaCanvasWorkaround)
+		{
+			if (!this.viaCtx)
+			{
+				this.viaCanvas = document.createElement("canvas");
+				this.viaCanvas.width = videoWidth;
+				this.viaCanvas.height = videoHeight;
+				this.viaCtx = this.viaCanvas.getContext("2d");
+			}
+			this.viaCtx.drawImage(this.video, 0, 0);
+			glw.videoToTexture(this.viaCanvas, this.webGL_texture);
+		}
+		else
+		{
+			glw.videoToTexture(this.video, this.webGL_texture);
+		}
+		glw.setBlend(this.srcBlend, this.destBlend);
+		glw.setOpacity(this.opacity);
+		glw.setTexture(this.webGL_texture);
+		tmpRect.set(this.x + offx, this.y + offy, this.x + offx + drawWidth, this.y + offy + drawHeight);
+		tmpQuad.set_from_rect(tmpRect);
+		glw.quad(tmpQuad.tlx, tmpQuad.tly, tmpQuad.trx, tmpQuad.try_, tmpQuad.brx, tmpQuad.bry, tmpQuad.blx, tmpQuad.bly);
+	};
+	function dbToLinear_nocap(x)
+	{
+		return Math.pow(10, x / 20);
+	};
+	function linearToDb_nocap(x)
+	{
+		return (Math.log(x) / Math.log(10)) * 20;
+	};
+	function dbToLinear(x)
+	{
+		var v = dbToLinear_nocap(x);
+		if (v < 0)
+			v = 0;
+		if (v > 1)
+			v = 1;
+		return v;
+	};
+	function linearToDb(x)
+	{
+		if (x < 0)
+			x = 0;
+		if (x > 1)
+			x = 1;
+		return linearToDb_nocap(x);
+	};
+	function Cnds() {};
+	Cnds.prototype.IsPlaying = function ()
+	{
+		return isVideoPlaying(this.video);
+	};
+	Cnds.prototype.IsPaused = function ()
+	{
+		return this.video.paused;
+	};
+	Cnds.prototype.HasEnded = function ()
+	{
+		return this.video.ended;
+	};
+	Cnds.prototype.IsMuted = function ()
+	{
+		return this.video.muted;
+	};
+	Cnds.prototype.OnPlaybackEvent = function (trig)
+	{
+		return this.currentTrigger === trig;
+	};
+	pluginProto.cnds = new Cnds();
+	function Acts() {};
+	Acts.prototype.SetSource = function (webm_src, ogv_src, mp4_src)
+	{
+		this.setSource(webm_src, ogv_src, mp4_src);
+		this.video.load();
+	};
+	Acts.prototype.SetPlaybackTime = function (s)
+	{
+		try {
+			this.video.currentTime = s;
+		}
+		catch (e)
+		{
+			if (console && console.error)
+				console.error("Exception setting video playback time: ", e);
+		}
+	};
+	Acts.prototype.SetLooping = function (l)
+	{
+		this.video.loop = (l !== 0);
+	};
+	Acts.prototype.SetMuted = function (m)
+	{
+		this.video.muted = (m !== 0);
+	};
+	Acts.prototype.SetVolume = function (v)
+	{
+		this.video.volume = dbToLinear(v);
+	};
+	Acts.prototype.Pause = function ()
+	{
+		this.queueVideoPlay(false);		// remove any play-on-next-touch queue, since we don't want it to be playing any more
+		this.video.pause();
+	};
+	Acts.prototype.Play = function ()
+	{
+		this.queueVideoPlay(true);
+	};
+	pluginProto.acts = new Acts();
+	function Exps() {};
+	Exps.prototype.PlaybackTime = function (ret)
+	{
+		ret.set_float(this.video.currentTime || 0);
+	};
+	Exps.prototype.Duration = function (ret)
+	{
+		ret.set_float(this.video.duration || 0);
+	};
+	Exps.prototype.Volume = function (ret)
+	{
+		ret.set_float(linearToDb(this.video.volume || 0));
+	};
+	pluginProto.exps = new Exps();
+}());
+;
+;
 cr.behaviors.Bullet = function(runtime)
 {
 	this.runtime = runtime;
@@ -23975,17 +24809,19 @@ cr.behaviors.lunarray_LiteTween = function(runtime)
 	};
 }());
 cr.getObjectRefTable = function () { return [
+	cr.plugins_.NinePatch,
 	cr.plugins_.AJAX,
 	cr.plugins_.Arr,
 	cr.plugins_.Browser,
 	cr.plugins_.CBHash256,
-	cr.plugins_.LocalStorage,
 	cr.plugins_.Function,
-	cr.plugins_.Text,
-	cr.plugins_.Rex_Hash,
-	cr.plugins_.TextBox,
-	cr.plugins_.Touch,
+	cr.plugins_.LocalStorage,
+	cr.plugins_.video,
 	cr.plugins_.Sprite,
+	cr.plugins_.Touch,
+	cr.plugins_.Rex_Hash,
+	cr.plugins_.Text,
+	cr.plugins_.TextBox,
 	cr.behaviors.Bullet,
 	cr.behaviors.destroy,
 	cr.behaviors.Sin,
@@ -24069,17 +24905,20 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Sprite.prototype.acts.SetScale,
 	cr.system_object.prototype.cnds.PickByComparison,
 	cr.plugins_.LocalStorage.prototype.acts.CheckItemExists,
+	cr.plugins_.video.prototype.acts.SetLooping,
 	cr.plugins_.LocalStorage.prototype.cnds.OnItemExists,
 	cr.plugins_.LocalStorage.prototype.acts.GetItem,
 	cr.plugins_.LocalStorage.prototype.cnds.OnItemGet,
 	cr.plugins_.TextBox.prototype.acts.SetText,
 	cr.plugins_.LocalStorage.prototype.exps.ItemValue,
+	cr.system_object.prototype.cnds.LayerVisible,
 	cr.plugins_.Sprite.prototype.cnds.CompareFrame,
 	cr.plugins_.LocalStorage.prototype.acts.SetItem,
 	cr.plugins_.TextBox.prototype.exps.Text,
 	cr.plugins_.Rex_Hash.prototype.acts.StringToHashTable,
-	cr.plugins_.TextBox.prototype.acts.SetEnabled,
+	cr.system_object.prototype.acts.SetLayerVisible,
 	cr.plugins_.TextBox.prototype.acts.SetVisible,
+	cr.plugins_.TextBox.prototype.acts.SetEnabled,
 	cr.plugins_.AJAX.prototype.acts.RequestFile,
 	cr.plugins_.Rex_Hash.prototype.acts.AddToValueByKeyString,
 	cr.plugins_.Arr.prototype.acts.JSONLoad,

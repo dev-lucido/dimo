@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1779263199,
+	"version": 1779271090,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -26,6 +26,11 @@
 		"images/level3buttonsprite-sheet1.png",
 		"images/level4buttonsprite-sheet0.png",
 		"images/level4buttonsprite-sheet1.png",
+		"images/popup9patch.png",
+		"images/overlaysprite-sheet0.png",
+		"images/popupbuttonssprite-sheet0.png",
+		"images/popupbuttonssprite-sheet1.png",
+		"images/sprite-sheet0.png",
 		"icon-16.png",
 		"icon-32.png",
 		"icon-114.png",
@@ -36,6 +41,7 @@
 		"level4_questions.json",
 		"level3_questions.json",
 		"level2_questions.json",
-		"level1_questions.json"
+		"level1_questions.json",
+		"dimo.mp4"
 	]
 }
