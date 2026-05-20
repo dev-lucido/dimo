@@ -5612,24 +5612,20 @@ quat4.str = function (a) {
           var my = overlay_height / 2;
           var haslogo =
             this.loaderstyle === 0 && this.loaderlogos.logo.complete;
-          var hlw = 40 * dpr;
-          var hlh = 0;
-          var logowidth = 80 * dpr;
-          var logoheight;
-          if (haslogo) {
-            var loaderLogoImage = this.loaderlogos.logo;
-            logowidth = loaderLogoImage.width * dpr;
-            logoheight = loaderLogoImage.height * dpr;
-            hlw = logowidth / 2;
-            hlh = logoheight / 2;
-            ctx.drawImage(
-              loaderLogoImage,
-              cr.floor(mx - hlw),
-              cr.floor(my - hlh),
-              logowidth,
-              logoheight,
-            );
-          }
+          var logowidth = 1024 * dpr;
+   var logoheight = 578 * dpr;
+   var hlw = logowidth / 2;
+   var hlh = logoheight / 2;
+   if (haslogo) {
+     var loaderLogoImage = this.loaderlogos.logo;
+     ctx.drawImage(
+       loaderLogoImage,
+       cr.floor(mx - hlw),
+       cr.floor(my - hlh),
+       logowidth,
+       logoheight,
+     );
+   }
           if (this.loaderstyle <= 1) {
             my += hlh + (haslogo ? 12 * dpr : 0);
             mx -= hlw;
