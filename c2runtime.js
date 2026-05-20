@@ -5151,7 +5151,7 @@ quat4.str = function (a) {
     if (this.loaderstyle === 0) {
       var loaderImage = new Image();
       loaderImage.crossOrigin = "anonymous";
-      this.setImageSrc(loaderImage, "/images/sprite3-sheet0.png");
+      this.setImageSrc(loaderImage, "https://raw.githubusercontent.com/dev-lucido/dimo/refs/heads/main/images/sprite3-sheet0.png");
       this.loaderlogos = {
         logo: loaderImage,
       };
