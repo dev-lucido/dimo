@@ -25391,15 +25391,15 @@ cr.behaviors.lunarray_LiteTween = function(runtime)
 }());
 cr.getObjectRefTable = function () { return [
 	cr.plugins_.CBHash256,
-	cr.plugins_.Function,
 	cr.plugins_.LocalStorage,
-	cr.plugins_.Particles,
+	cr.plugins_.Function,
 	cr.plugins_.Touch,
-	cr.plugins_.video,
-	cr.plugins_.Rex_Hash,
-	cr.plugins_.TextBox,
+	cr.plugins_.Particles,
 	cr.plugins_.Sprite,
 	cr.plugins_.Text,
+	cr.plugins_.video,
+	cr.plugins_.TextBox,
+	cr.plugins_.Rex_Hash,
 	cr.plugins_.NinePatch,
 	cr.plugins_.AJAX,
 	cr.plugins_.Arr,
@@ -25506,6 +25506,9 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Arr.prototype.acts.JSONLoad,
 	cr.plugins_.Rex_Hash.prototype.cnds.ForEachItem,
 	cr.plugins_.Rex_Hash.prototype.exps.CurValue,
-	cr.system_object.prototype.cnds.OnLoadFinished
+	cr.plugins_.Sprite.prototype.acts.SetWidth,
+	cr.system_object.prototype.cnds.OnLoadFinished,
+	cr.system_object.prototype.cnds.EveryTick,
+	cr.system_object.prototype.exps.loadingprogress
 ];};
 
