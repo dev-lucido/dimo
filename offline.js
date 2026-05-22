@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1779438647,
+	"version": 1779440878,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -13,6 +13,7 @@
 		"images/answerletters-sheet2.png",
 		"images/bgsprite-sheet0.png",
 		"images/bgsprite-sheet1.png",
+		"images/bgsprite-sheet2.png",
 		"images/powerbarsprite-sheet0.png",
 		"images/watersprite-sheet0.png",
 		"images/textbackgroundsprite-sheet0.png",
