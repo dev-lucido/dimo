@@ -1,11 +1,12 @@
 ﻿{
-	"version": 1779350620,
+	"version": 1779438647,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
 		"jquery-3.4.1.min.js",
 		"offlineClient.js",
 		"images/fishsprite-sheet0.png",
+		"images/fishsprite-sheet1.png",
 		"images/spitsprite-sheet0.png",
 		"images/answerletters-sheet0.png",
 		"images/answerletters-sheet1.png",
