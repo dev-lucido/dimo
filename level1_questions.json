@@ -1,20 +1,76 @@
 {
   "c2array": true,
-  "size": [2, 5, 1],
+  "size": [10, 5, 1],
   "data": [
     [
-      ["What is the capital of France?"],
-      ["Paris"],
-      ["Berlin"],
-      ["Madrid"],
-      ["Rome"]
+      ["Who was the first President of the United States?"],
+      ["George Washington"],
+      ["Abraham Lincoln"],
+      ["Thomas Jefferson"],
+      ["John Adams"]
     ],
     [
-      ["Which planet is known as the Red Planet?"],
-      ["Mars"],
-      ["Venus"],
-      ["Jupiter"],
-      ["Saturn"]
+      ["Which ancient civilization built the pyramids of Giza?"],
+      ["Ancient Egyptians"],
+      ["Romans"],
+      ["Greeks"],
+      ["Persians"]
+    ],
+    [
+      ["In which year did World War II end?"],
+      ["1945"],
+      ["1939"],
+      ["1918"],
+      ["1950"]
+    ],
+    [
+      ["Who was known as the “Maid of Orléans”?"],
+      ["Joan of Arc"],
+      ["Cleopatra"],
+      ["Queen Victoria"],
+      ["Marie Curie"]
+    ],
+    [
+      ["Which empire was ruled by Julius Caesar?"],
+      ["Roman Empire"],
+      ["Ottoman Empire"],
+      ["British Empire"],
+      ["Mongol Empire"]
+    ],
+    [
+      ["The Great Wall of China was mainly built to protect against whom?"],
+      ["Northern invaders"],
+      ["European traders"],
+      ["Japanese pirates"],
+      ["Indian kingdoms"]
+    ],
+    [
+      ["Who discovered the sea route to India around Africa in 1498?"],
+      ["Vasco da Gama"],
+      ["Christopher Columbus"],
+      ["Ferdinand Magellan"],
+      ["Marco Polo"]
+    ],
+    [
+      ["Which country gifted the Statue of Liberty to the United States?"],
+      ["France"],
+      ["Britain"],
+      ["Germany"],
+      ["Spain"]
+    ],
+    [
+      ["Who was the first man to walk on the Moon?"],
+      ["Neil Armstrong"],
+      ["Yuri Gagarin"],
+      ["Buzz Aldrin"],
+      ["Michael Collins"]
+    ],
+    [
+      ["Which war was fought between the North and South regions of the United States?"],
+      ["American Civil War"],
+      ["World War I"],
+      ["Cold War"],
+      ["Vietnam War"]
     ]
   ]
 }

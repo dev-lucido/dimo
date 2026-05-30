@@ -1,20 +1,14 @@
 {
   "c2array": true,
-  "size": [2, 5, 1],
+  "size": [1, 5, 1],
   "data": [
+    
     [
-      ["Who painted the Mona Lisa?"],
-      ["Leonardo da Vinci"],
-      ["Vincent van Gogh"],
-      ["Pablo Picasso"],
-      ["Claude Monet"]
-    ],
-    [
-      ["What is the largest mammal in the world?"],
-      ["Blue Whale"],
-      ["Elephant"],
-      ["Giraffe"],
-      ["Great White Shark"]
+      ["Which war was fought between the North and South regions of the United States?"],
+      ["American Civil War"],
+      ["World War I"],
+      ["Cold War"],
+      ["Vietnam War"]
     ]
   ]
 }
