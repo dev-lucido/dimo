@@ -17176,285 +17176,6 @@ cr.plugins_.Browser = function(runtime)
 	};
 	pluginProto.exps = new Exps();
 }());
-;
-;
-cr.plugins_.Button = function(runtime)
-{
-	this.runtime = runtime;
-};
-(function ()
-{
-	var pluginProto = cr.plugins_.Button.prototype;
-	pluginProto.Type = function(plugin)
-	{
-		this.plugin = plugin;
-		this.runtime = plugin.runtime;
-	};
-	var typeProto = pluginProto.Type.prototype;
-	typeProto.onCreate = function()
-	{
-	};
-	pluginProto.Instance = function(type)
-	{
-		this.type = type;
-		this.runtime = type.runtime;
-	};
-	var instanceProto = pluginProto.Instance.prototype;
-	instanceProto.onCreate = function()
-	{
-		if (this.runtime.isDomFree)
-		{
-			cr.logexport("[Construct 2] Button plugin not supported on this platform - the object will not be created");
-			return;
-		}
-		this.isCheckbox = (this.properties[0] === 1);
-		this.inputElem = document.createElement("input");
-		if (this.isCheckbox)
-			this.elem = document.createElement("label");
-		else
-			this.elem = this.inputElem;
-		this.labelText = null;
-		this.inputElem.type = (this.isCheckbox ? "checkbox" : "button");
-		this.inputElem.id = this.properties[6];
-		jQuery(this.elem).appendTo(this.runtime.canvasdiv ? this.runtime.canvasdiv : "body");
-		if (this.isCheckbox)
-		{
-			jQuery(this.inputElem).appendTo(this.elem);
-			this.labelText = document.createTextNode(this.properties[1]);
-			jQuery(this.elem).append(this.labelText);
-			this.inputElem.checked = (this.properties[7] !== 0);
-			jQuery(this.elem).css("font-family", "sans-serif");
-			jQuery(this.elem).css("display", "inline-block");
-			jQuery(this.elem).css("color", "black");
-		}
-		else
-			this.inputElem.value = this.properties[1];
-		this.elem.title = this.properties[2];
-		this.inputElem.disabled = (this.properties[4] === 0);
-		this.autoFontSize = (this.properties[5] !== 0);
-		this.element_hidden = false;
-		if (this.properties[3] === 0)
-		{
-			jQuery(this.elem).hide();
-			this.visible = false;
-			this.element_hidden = true;
-		}
-		this.inputElem.onclick = (function (self) {
-			return function(e) {
-				e.stopPropagation();
-				self.runtime.isInUserInputEvent = true;
-				self.runtime.trigger(cr.plugins_.Button.prototype.cnds.OnClicked, self);
-				self.runtime.isInUserInputEvent = false;
-			};
-		})(this);
-		this.elem.addEventListener("touchstart", function (e) {
-			e.stopPropagation();
-		}, false);
-		this.elem.addEventListener("touchmove", function (e) {
-			e.stopPropagation();
-		}, false);
-		this.elem.addEventListener("touchend", function (e) {
-			e.stopPropagation();
-		}, false);
-		jQuery(this.elem).mousedown(function (e) {
-			e.stopPropagation();
-		});
-		jQuery(this.elem).mouseup(function (e) {
-			e.stopPropagation();
-		});
-		jQuery(this.elem).keydown(function (e) {
-			e.stopPropagation();
-		});
-		jQuery(this.elem).keyup(function (e) {
-			e.stopPropagation();
-		});
-		this.lastLeft = 0;
-		this.lastTop = 0;
-		this.lastRight = 0;
-		this.lastBottom = 0;
-		this.lastWinWidth = 0;
-		this.lastWinHeight = 0;
-		this.updatePosition(true);
-		this.runtime.tickMe(this);
-	};
-	instanceProto.saveToJSON = function ()
-	{
-		var o = {
-			"tooltip": this.elem.title,
-			"disabled": !!this.inputElem.disabled
-		};
-		if (this.isCheckbox)
-		{
-			o["checked"] = !!this.inputElem.checked;
-			o["text"] = this.labelText.nodeValue;
-		}
-		else
-		{
-			o["text"] = this.elem.value;
-		}
-		return o;
-	};
-	instanceProto.loadFromJSON = function (o)
-	{
-		this.elem.title = o["tooltip"];
-		this.inputElem.disabled = o["disabled"];
-		if (this.isCheckbox)
-		{
-			this.inputElem.checked = o["checked"];
-			this.labelText.nodeValue = o["text"];
-		}
-		else
-		{
-			this.elem.value = o["text"];
-		}
-	};
-	instanceProto.onDestroy = function ()
-	{
-		if (this.runtime.isDomFree)
-			return;
-		jQuery(this.elem).remove();
-		this.elem = null;
-	};
-	instanceProto.tick = function ()
-	{
-		this.updatePosition();
-	};
-	var last_canvas_offset = null;
-	var last_checked_tick = -1;
-	instanceProto.updatePosition = function (first)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		var left = this.layer.layerToCanvas(this.x, this.y, true);
-		var top = this.layer.layerToCanvas(this.x, this.y, false);
-		var right = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, true);
-		var bottom = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, false);
-		var rightEdge = this.runtime.width / this.runtime.devicePixelRatio;
-		var bottomEdge = this.runtime.height / this.runtime.devicePixelRatio;
-		if (!this.visible || !this.layer.visible || right <= 0 || bottom <= 0 || left >= rightEdge || top >= bottomEdge)
-		{
-			if (!this.element_hidden)
-				jQuery(this.elem).hide();
-			this.element_hidden = true;
-			return;
-		}
-		if (left < 1)
-			left = 1;
-		if (top < 1)
-			top = 1;
-		if (right >= rightEdge)
-			right = rightEdge - 1;
-		if (bottom >= bottomEdge)
-			bottom = bottomEdge - 1;
-		var curWinWidth = window.innerWidth;
-		var curWinHeight = window.innerHeight;
-		if (!first && this.lastLeft === left && this.lastTop === top && this.lastRight === right && this.lastBottom === bottom && this.lastWinWidth === curWinWidth && this.lastWinHeight === curWinHeight)
-		{
-			if (this.element_hidden)
-			{
-				jQuery(this.elem).show();
-				this.element_hidden = false;
-			}
-			return;
-		}
-		this.lastLeft = left;
-		this.lastTop = top;
-		this.lastRight = right;
-		this.lastBottom = bottom;
-		this.lastWinWidth = curWinWidth;
-		this.lastWinHeight = curWinHeight;
-		if (this.element_hidden)
-		{
-			jQuery(this.elem).show();
-			this.element_hidden = false;
-		}
-		var offx = Math.round(left) + jQuery(this.runtime.canvas).offset().left;
-		var offy = Math.round(top) + jQuery(this.runtime.canvas).offset().top;
-		jQuery(this.elem).css("position", "absolute");
-		jQuery(this.elem).offset({left: offx, top: offy});
-		jQuery(this.elem).width(Math.round(right - left));
-		jQuery(this.elem).height(Math.round(bottom - top));
-		if (this.autoFontSize)
-			jQuery(this.elem).css("font-size", ((this.layer.getScale(true) / this.runtime.devicePixelRatio) - 0.2) + "em");
-	};
-	instanceProto.draw = function(ctx)
-	{
-	};
-	instanceProto.drawGL = function(glw)
-	{
-	};
-	function Cnds() {};
-	Cnds.prototype.OnClicked = function ()
-	{
-		return true;
-	};
-	Cnds.prototype.IsChecked = function ()
-	{
-		return this.isCheckbox && this.inputElem.checked;
-	};
-	pluginProto.cnds = new Cnds();
-	function Acts() {};
-	Acts.prototype.SetText = function (text)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		if (this.isCheckbox)
-			this.labelText.nodeValue = text;
-		else
-			this.elem.value = text;
-	};
-	Acts.prototype.SetTooltip = function (text)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.elem.title = text;
-	};
-	Acts.prototype.SetVisible = function (vis)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.visible = (vis !== 0);
-	};
-	Acts.prototype.SetEnabled = function (en)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.inputElem.disabled = (en === 0);
-	};
-	Acts.prototype.SetFocus = function ()
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.inputElem.focus();
-	};
-	Acts.prototype.SetBlur = function ()
-	{
-		if (this.runtime.isDomFree)
-			return;
-		this.inputElem.blur();
-	};
-	Acts.prototype.SetCSSStyle = function (p, v)
-	{
-		if (this.runtime.isDomFree)
-			return;
-		jQuery(this.elem).css(p, v);
-	};
-	Acts.prototype.SetChecked = function (c)
-	{
-		if (this.runtime.isDomFree || !this.isCheckbox)
-			return;
-		this.inputElem.checked = (c === 1);
-	};
-	Acts.prototype.ToggleChecked = function ()
-	{
-		if (this.runtime.isDomFree || !this.isCheckbox)
-			return;
-		this.inputElem.checked = !this.inputElem.checked;
-	};
-	pluginProto.acts = new Acts();
-	function Exps() {};
-	pluginProto.exps = new Exps();
-}());
 cr.plugins_.CBHash256 = function (runtime) {
   this.runtime = runtime;
 };
@@ -24339,6 +24060,209 @@ cr.behaviors.Fade = function(runtime)
 }());
 ;
 ;
+cr.behaviors.Rex_text_properties = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var behaviorProto = cr.behaviors.Rex_text_properties.prototype;
+	behaviorProto.Type = function(behavior, objtype)
+	{
+		this.behavior = behavior;
+		this.objtype = objtype;
+		this.runtime = behavior.runtime;
+	};
+	var behtypeProto = behaviorProto.Type.prototype;
+	behtypeProto.onCreate = function()
+	{
+	};
+	behaviorProto.Instance = function(type, inst)
+	{
+		this.type = type;
+		this.behavior = type.behavior;
+		this.inst = inst;
+		this.runtime = type.runtime;
+	};
+	var behinstProto = behaviorProto.Instance.prototype;
+	behinstProto.onCreate = function()
+	{
+		this.text_type = this.get_text_type();
+	};
+	behinstProto.tick = function ()
+	{
+	};
+   	behinstProto.get_text_type = function ()
+	{
+	    var text_type;
+        if (cr.plugins_.Text &&
+		    (this.inst instanceof cr.plugins_.Text.prototype.Instance))
+	        text_type = "Text";
+	    else if (cr.plugins_.Spritefont2 &&
+		         (this.inst instanceof cr.plugins_.Spritefont2.prototype.Instance))
+			text_type = "Spritefont2";
+	    else if (cr.plugins_.TextBox &&
+		         (this.inst instanceof cr.plugins_.TextBox.prototype.Instance))
+		    text_type = "TextBox";
+	    else if (cr.plugins_.rex_TagText &&
+		         (this.inst instanceof cr.plugins_.rex_TagText.prototype.Instance))
+		    text_type = "rex_TagText";
+	    else if (cr.plugins_.rex_bbcodeText &&
+		         (this.inst instanceof cr.plugins_.rex_bbcodeText.prototype.Instance))
+		    text_type = "rex_bbcodeText";
+		else
+		    text_type = "";
+		return text_type;
+	};
+    behinstProto._get_webgl_ctx = function ()
+	{
+        var inst = this.inst;
+        var ctx = inst.myctx;
+		if (!ctx)
+		{
+			inst.mycanvas = document.createElement("canvas");
+            var scaledwidth = Math.ceil(inst.layer.getScale()*inst.width);
+            var scaledheight = Math.ceil(inst.layer.getAngle()*inst.height);
+			inst.mycanvas.width = scaledwidth;
+			inst.mycanvas.height = scaledheight;
+			inst.lastwidth = scaledwidth;
+			inst.lastheight = scaledheight;
+			inst.myctx = inst.mycanvas.getContext("2d");
+            ctx = inst.myctx;
+		}
+        return ctx;
+	};
+	behinstProto.drawText = function ()
+	{
+        var inst = this.inst;
+        var ctx = (this.runtime.enableWebGL)?
+                  this._get_webgl_ctx():this.runtime.ctx;
+        inst.draw(ctx);                      // call this function to get lines
+	};
+	function Cnds() {};
+	behaviorProto.cnds = new Cnds();
+	function Acts() {};
+	behaviorProto.acts = new Acts();
+	Acts.prototype.SetHorizontalAlignment = function(align)
+	{
+        if (this.text_type === "Spritefont2")
+        {
+            cr.plugins_.Spritefont2.prototype.acts.SetHAlign.call(this.inst, align);
+        }
+	    else // Text, rex_TagText, rex_bbcodeText
+	    {
+	        if (this.inst.halign != align)
+	        {
+	            this.inst.need_text_redraw = true;
+	            this.runtime.redraw = true;
+	        }
+            this.inst.halign = align;   // 0=left, 1=center, 2=right
+        }
+	};
+	Acts.prototype.SetVerticalAlignment = function(align)
+	{
+        if (this.text_type === "Spritefont2")
+        {
+            cr.plugins_.Spritefont2.prototype.acts.SetVAlign.call(this.inst, align);
+        }
+	    else // Text, rex_TagText, rex_bbcodeText
+	    {
+	        if (this.inst.valign != align)
+	        {
+	            this.inst.need_text_redraw = true;
+	            this.runtime.redraw = true;
+	        }
+            this.inst.valign = align;   // 0=top, 1=center, 2=bottom
+        }
+	};
+	Acts.prototype.SetWrapping = function(wrap_mode)
+	{
+	    wrap_mode = (wrap_mode === 0);  // 0=word, 1=character
+        if (this.text_type === "Spritefont2")
+        {
+	        if (this.inst.wrapbyword != wrap_mode)
+	        {
+			    this.inst.text_changed = true;
+			    this.runtime.redraw = true;
+	        }
+            this.inst.wrapbyword = wrap_mode;
+        }
+	    else // Text, rex_TagText, rex_bbcodeText
+	    {
+	        if (this.inst.wrapbyword != wrap_mode)
+	        {
+	            this.inst.need_text_redraw = true;
+	            this.runtime.redraw = true;
+	        }
+            this.inst.wrapbyword = wrap_mode;
+        }
+	};
+	Acts.prototype.SetLineHeight = function(line_height_offset)
+	{
+        if (this.text_type === "Spritefont2")
+        {
+            cr.plugins_.Spritefont2.prototype.acts.SetLineHeight.call(this.inst, line_height_offset);
+        }
+	    else // Text, rex_TagText, rex_bbcodeText
+	    {
+	        if (this.inst.line_height_offset != line_height_offset)
+	        {
+	            this.inst.need_text_redraw = true;
+	            this.runtime.redraw = true;
+	        }
+            this.inst.line_height_offset = line_height_offset;
+        }
+	};
+	Acts.prototype.SetFontFace = function (face_, style_)
+	{
+        if (this.text_type === "Spritefont2")
+        {
+        }
+	    else // Text, rex_TagText, rex_bbcodeText
+	    {
+		    var newstyle = "";
+		    switch (style_) {
+		    case 1: newstyle = "bold"; break;
+		    case 2: newstyle = "italic"; break;
+		    case 3: newstyle = "bold italic"; break;
+		    }
+		    var inst = this.inst;
+		    if (face_ === inst.facename && newstyle === inst.fontstyle)
+		    	return;		// no change
+		    inst.facename = face_;
+		    inst.fontstyle = newstyle;
+		    inst.updateFont();
+	    }
+	};
+	function Exps() {};
+	behaviorProto.exps = new Exps();
+    Exps.prototype.LineBreakContent = function (ret)
+	{
+        this.drawText();
+        var content;
+        if ((this.text_type === "Text") || (this.text_type === "Spritefont2"))
+        {
+            content = this.inst.lines.join("\n");
+        }
+        else if ((this.text_type === "rex_TagText") || (this.text_type === "rex_bbcodeText"))
+        {
+            var pensMgr = this.inst.copyPensMgr();
+            var cnt = pensMgr.getLines().length;
+            var lines = [];
+            for (var i=0; i<cnt; i++)
+            {
+              var si = pensMgr.getLineStartChartIndex(i);
+              var ei = pensMgr.getLineEndChartIndex(i);
+              var txt = pensMgr.getSliceTagText(si, ei+1);
+              lines.push(txt);
+            }
+            content = lines.join("\n");
+        }
+	    ret.set_string( content );
+	};
+}());
+;
+;
 cr.behaviors.Sin = function(runtime)
 {
 	this.runtime = runtime;
@@ -25673,22 +25597,22 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.AJAX,
 	cr.plugins_.Arr,
 	cr.plugins_.Browser,
-	cr.plugins_.Button,
 	cr.plugins_.CBHash256,
-	cr.plugins_.LocalStorage,
 	cr.plugins_.Function,
-	cr.plugins_.Text,
-	cr.plugins_.video,
-	cr.plugins_.TextBox,
-	cr.plugins_.Sprite,
-	cr.plugins_.Touch,
+	cr.plugins_.LocalStorage,
 	cr.plugins_.Particles,
+	cr.plugins_.Sprite,
+	cr.plugins_.TextBox,
 	cr.plugins_.Rex_Hash,
+	cr.plugins_.Touch,
+	cr.plugins_.video,
+	cr.plugins_.Text,
 	cr.behaviors.Bullet,
 	cr.behaviors.destroy,
 	cr.behaviors.Sin,
 	cr.behaviors.lunarray_LiteTween,
 	cr.behaviors.Fade,
+	cr.behaviors.Rex_text_properties,
 	cr.system_object.prototype.cnds.OnLayoutStart,
 	cr.system_object.prototype.acts.ResetGlobals,
 	cr.system_object.prototype.acts.SetLayerVisible,
@@ -25777,25 +25701,19 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.LocalStorage.prototype.acts.CheckItemExists,
 	cr.plugins_.video.prototype.acts.SetLooping,
 	cr.plugins_.TextBox.prototype.acts.SetCSSStyle,
-	cr.plugins_.Button.prototype.acts.SetCSSStyle,
 	cr.plugins_.LocalStorage.prototype.cnds.OnItemExists,
 	cr.plugins_.LocalStorage.prototype.acts.GetItem,
 	cr.plugins_.LocalStorage.prototype.cnds.OnItemGet,
-	cr.plugins_.Button.prototype.acts.SetChecked,
 	cr.plugins_.TextBox.prototype.acts.SetText,
 	cr.plugins_.LocalStorage.prototype.exps.ItemValue,
-	cr.plugins_.Button.prototype.cnds.IsChecked,
 	cr.plugins_.Sprite.prototype.acts.SetScale,
 	cr.plugins_.TextBox.prototype.exps.Text,
 	cr.plugins_.LocalStorage.prototype.acts.SetItem,
 	cr.plugins_.Rex_Hash.prototype.acts.StringToHashTable,
-	cr.plugins_.Button.prototype.acts.SetVisible,
-	cr.plugins_.Button.prototype.acts.SetEnabled,
 	cr.plugins_.TextBox.prototype.acts.SetVisible,
 	cr.plugins_.TextBox.prototype.acts.SetEnabled,
-	cr.plugins_.Button.prototype.cnds.OnClicked,
-	cr.plugins_.LocalStorage.prototype.acts.RemoveItem,
 	cr.plugins_.Browser.prototype.acts.GoToURLWindow,
+	cr.plugins_.LocalStorage.prototype.acts.RemoveItem,
 	cr.plugins_.AJAX.prototype.acts.RequestFile,
 	cr.plugins_.Rex_Hash.prototype.acts.AddToValueByKeyString,
 	cr.plugins_.Arr.prototype.acts.JSONLoad,
