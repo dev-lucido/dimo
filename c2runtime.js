@@ -25701,6 +25701,7 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.LocalStorage.prototype.acts.CheckItemExists,
 	cr.plugins_.video.prototype.acts.SetLooping,
 	cr.plugins_.TextBox.prototype.acts.SetCSSStyle,
+	cr.plugins_.Browser.prototype.acts.ExecJs,
 	cr.plugins_.LocalStorage.prototype.cnds.OnItemExists,
 	cr.plugins_.LocalStorage.prototype.acts.GetItem,
 	cr.plugins_.LocalStorage.prototype.cnds.OnItemGet,
