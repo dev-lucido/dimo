@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1780305811,
+	"version": 1780314253,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -34,8 +34,8 @@
 		"images/popupbuttonssprite-sheet1.png",
 		"images/popupbuttonssprite-sheet2.png",
 		"images/levelnamessprite-sheet0.png",
-		"images/sprite2-sheet0.png",
-		"images/sprite2-sheet1.png",
+		"images/arrowbuttonsprite-sheet0.png",
+		"images/arrowbuttonsprite-sheet1.png",
 		"images/logosprite-sheet0.png",
 		"images/logosprite-sheet1.png",
 		"images/particles1.png",
@@ -46,6 +46,7 @@
 		"images/leaderboardsprite-sheet0.png",
 		"images/termsconditionscheckboxsprite-sheet0.png",
 		"images/termsconditionscheckboxsprite-sheet1.png",
+		"images/9patch.png",
 		"icon-16.png",
 		"icon-32.png",
 		"icon-114.png",
