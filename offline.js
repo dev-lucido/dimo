@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1780474352,
+	"version": 1780474829,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -58,7 +58,6 @@
 		"level3_questions.json",
 		"level2_questions.json",
 		"level1_questions.json",
-		"dimo.mp4",
-		"rules-and-regulations.pdf"
+		"dimo.mp4"
 	]
 }
