@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1780476501,
+	"version": 1782208872,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -47,6 +47,9 @@
 		"images/termsconditionscheckboxsprite-sheet0.png",
 		"images/termsconditionscheckboxsprite-sheet1.png",
 		"images/9patch.png",
+		"images/ibutton-sheet0.png",
+		"images/howtoplaysprite-sheet0.png",
+		"images/howtoplaysprite-sheet1.png",
 		"icon-16.png",
 		"icon-32.png",
 		"icon-114.png",
@@ -58,6 +61,10 @@
 		"level3_questions.json",
 		"level2_questions.json",
 		"level1_questions.json",
-		"dimo.mp4"
+		"dimo.mp4",
+		"level1_questions copy.json",
+		"level2_questions copy.json",
+		"level3_questions copy.json",
+		"level4_questions copy.json"
 	]
 }

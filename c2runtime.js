@@ -25598,15 +25598,15 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Arr,
 	cr.plugins_.Browser,
 	cr.plugins_.CBHash256,
-	cr.plugins_.LocalStorage,
 	cr.plugins_.Function,
-	cr.plugins_.Text,
-	cr.plugins_.video,
-	cr.plugins_.TextBox,
+	cr.plugins_.LocalStorage,
 	cr.plugins_.Touch,
+	cr.plugins_.Text,
+	cr.plugins_.Sprite,
 	cr.plugins_.Particles,
 	cr.plugins_.Rex_Hash,
-	cr.plugins_.Sprite,
+	cr.plugins_.video,
+	cr.plugins_.TextBox,
 	cr.behaviors.Bullet,
 	cr.behaviors.destroy,
 	cr.behaviors.Sin,
@@ -25724,6 +25724,7 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Sprite.prototype.acts.SetWidth,
 	cr.system_object.prototype.cnds.OnLoadFinished,
 	cr.system_object.prototype.cnds.EveryTick,
-	cr.system_object.prototype.exps.loadingprogress
+	cr.system_object.prototype.exps.loadingprogress,
+	cr.system_object.prototype.cnds.TriggerOnce
 ];};
 

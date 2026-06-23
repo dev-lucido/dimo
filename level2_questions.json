@@ -1,14 +1,41 @@
 {
   "c2array": true,
-  "size": [1, 5, 1],
+  "size": [35, 5, 1],
   "data": [
-    
-    [
-      ["Which war was fought between the North and South regions of the United States?"],
-      ["American Civil War"],
-      ["World War I"],
-      ["Cold War"],
-      ["Vietnam War"]
-    ]
+    [["How many green color diagonal lines in the DIMO Logo?"], ["6"], ["5"], ["7"], ["9"]],
+    [["What milestone turnover mark did DIMO reach for the first time?"], ["100 billion rupees"], ["10 Million Rupees"], ["200 Million Rupees"], ["10 Billion Rupees"]],
+    [["What exact turnover value was reported for the Group this year?"], ["Rs. 104 Bn"], ["10.4 Bn"], ["5 Bn"], ["200 Bn"]],
+    [["What percentage increase in turnover was achieved this year?"], ["107%"], ["10%"], ["207%"], ["100%"]],
+    [["What enterprise platform was implemented to adopt new technology?"], ["SAP"], ["Oracle ERP"], ["Microsoft 365"], ["CRM"]],
+    [["Who retired from the Board of Directors during the financial year?"], ["Asite Talwatte"], ["Wijith Pushpawela"], ["Asela Perera"], ["Chaminda Ranawana"]],
+    [["What was the percentage year-on-year increase in DIMO's PAT?"], ["118%"], ["100%"], ["120%"], ["218%"]],
+    [["According to CBSL, what was the estimated real GDP growth?"], ["5%"], ["10%"], ["15%"], ["20%"]],
+    [["How many full scholarships were awarded for Technical Education?"], ["53"], ["3"], ["23"], ["30"]],
+    [["Which segment emerged as the strongest contributor to the turnaround?"], ["Mobility"], ["Healthcare"], ["education"], ["agriculture"]],
+    [["What was the percentage increase in taxes paid by DIMO?"], ["56%"], ["16%"], ["40%"], ["60%"]],
+    [["How many newly commissioned solar power plants contributed to profitability?"], ["6"], ["3"], ["10"], ["1"]],
+    [["What capacity in megawatts did the six solar plants contribute to the grid?"], ["18MW"], ["25MW"], ["16MW"], ["10MW"]],
+    [["Which division maintained momentum with the Jaffna project?"], ["Fluid and Water"], ["Power and energy"], ["agriculture solutions"], ["Automotive"]],
+    [["In which country did the Construction Machinery Sales secure an order?"], ["Maldives"], ["Pakistan"], ["India"], ["Bangladesh"]],
+    [["Which division of the Healthcare segment contributed positively to performance?"], ["Medical Equipment"], ["Ophthalmology"], ["Pharmaceutical"], ["Diagnostics"]],
+    [["Which SAP tool is introduced in Phase II for automated planning and analytics?"], ["SAP Analytics Cloud"], ["ERP Cloud"], ["SAP Feildglass"], ["SAP Ariba"]],
+    [["What was DIMO's net employment increase rate recorded during the year?"], ["12%"], ["2%"], ["22%"], ["32%"]],
+    [["What is the name of DIMO's volunteerism programme for community service?"], ["Operation 8"], ["Operation Community"], ["Operation 1"], ["Operation 9"]],
+    [["How many hours a year is an employee encouraged to volunteer in Operation 8?"], ["8"], ["5"], ["7"], ["9"]],
+    [["How many incidents of inadvertent non-compliance were recorded during the year?"], ["0"], ["1"], ["5"], ["4"]],
+    [["In what month and year was Natasha Boralessa appointed as a Director?"], ["September 2025"], ["August 2025"], ["October 2025"], ["December 2025"]],
+    [["In what month and year was Rumal Fernando appointed as a Board Director?"], ["January 2026"], ["January 2025"], ["October 2026"], ["July 2026"]],
+    [["In what month and year was Indrajit Wickramasinghe appointed to the Board?"], ["July 2026"], ["August 2025"], ["October 2025"], ["September 2025"]],
+    [["Who serves as the Chief Marketing Officer in the Group Management Committee?"], ["Rajeev Pandithage"], ["Dinuk Peiris"], ["Wijith Pushpawela"], ["Suresh Gooneratne"]],
+    [["What was the total amount of debt recorded under capital inputs?"], ["Rs. 17,486 Mn"], ["Rs. 27,486 Mn"], ["Rs. 47,486 Mn"], ["Rs. 67,486 Mn"]],
+    [["What total amount of shareholder funds was recorded in the value model?"], ["Rs. 14, 861 Mn"], ["Rs. 6,800 Mn"], ["Rs. 19, 800 Mn"], ["Rs. 16,861 Mn"]],
+    [["How many buildings does DIMO own according to the Manufactured Capital inputs?"], ["19"], ["39"], ["59"], ["25"]],
+    [["What was the total number of employees recorded under Human Capital?"], ["1900"], ["2241"], ["2941"], ["3246"]],
+    [["How many active own brands does DIMO possess under Intellectual Capital?"], ["25"], ["10"], ["35"], ["20"]],
+    [["What was the total number of global principals partnering with DIMO?"], ["219"], ["109"], ["309"], ["119"]],
+    [["What percentage of market capitalization year-on-year growth was achieved?"], ["25.5%"], ["52%"], ["22%"], ["50%"]],
+    [["How many total learning hours were achieved for employee development?"], ["19288"], ["16200"], ["9822"], ["19000"]],
+    [["What was the total training investment amount in rupees for employee growth?"], ["Rs. 14.4 Mn"], ["Rs. 20 Mn"], ["Rs. 24 Mn"], ["Rs. 19 Mn"]],
+    [["How many new employment opportunities were created as an economic outcome?"], ["340"], ["500"], ["740"], ["640"]]
   ]
 }
